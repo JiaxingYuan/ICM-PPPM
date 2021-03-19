@@ -29,4 +29,4 @@ kspace_modify slab #0 mismatch #1 #2 interface_height #3 order_image_charge #4 #
 
 # Reproducibility：
 
-In the folder /examples, there are two example input files with the corresponding output files for benchmark test. Also, one example input file for practical salt (1:1 salt) MD simulation is presented. 
+In the folder /examples, there are two example input files with the corresponding output files for benchmark test. Also, an input file for practical MD simulation of monovalent electrolyte is presented. 

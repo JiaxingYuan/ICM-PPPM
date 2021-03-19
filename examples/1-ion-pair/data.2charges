@@ -1,0 +1,18 @@
+LAMMPS Description
+ 
+ 2 atoms
+ 
+ 1  atom types
+
+    -3 3    xlo xhi
+    -3 3  ylo yhi
+   -30 30   zlo zhi
+
+Masses
+ 
+  1 1
+
+Atoms#atom_ID,mol_ID,atom_type,x,y,z
+
+1 1 1  1 -1.8500000000  -0.7280000000  -1.8500000000
+2 1 1  -1 -1.8500000000  -1.8500000000  2.9160000000

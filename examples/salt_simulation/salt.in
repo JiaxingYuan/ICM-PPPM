@@ -1,0 +1,71 @@
+processors * * 1
+log out
+units lj
+atom_style full
+atom_modify map array
+boundary p p f
+region box block 0 30 0 30 -22.5 22.5
+create_box 2 box
+region middle block 0 30 0 30 -4 4
+create_atoms 1 random 500 198 middle
+create_atoms 2 random 500 56 middle
+variable L equal 9 #distance between dielectric interfaces
+variable upper_delta equal -0.95
+variable lower_delta equal -0.95
+variable upper_rho equal 0 # surface charge up
+variable lower_rho equal 0 # surface charge down
+variable temperature equal 1.2
+variable epsilon equal 0.2777777778 #1/(Bjerrum length*temperature)
+variable coul_cut equal 15
+variable slab_factor equal 3
+variable short_order equal 2 #  number of images for short part=ceil(coul_cut/L)
+variable long_order equal 5 #  number of images for long part 
+variable lower_wall equal -${L}*0.5 
+variable upper_wall equal  ${L}*0.5 
+
+group ani type 1
+group cat type 2
+mass 1 1
+mass 2 1
+set type 1 charge -1
+set type 2 charge 1
+fix wallhi all wall/lj126 zhi ${upper_wall} 1 0.5 0.5612310242 units box
+fix walllo all wall/lj126 zlo ${lower_wall} 1 0.5 0.5612310242 units box
+fix energy all nve
+thermo 1000		 
+thermo_style custom step temp ke pe etotal 
+
+###Soft potential
+neighbor        3 bin    
+pair_style soft 1.0
+pair_coeff * * 0.0
+variable prefactor equal ramp(0,30)
+fix 1 all adapt 1 pair soft a * * v_prefactor
+fix lgv1 all langevin ${temperature} ${temperature} 100.0 81
+timestep 0.001
+run 100000
+unfix 1
+unfix lgv1
+
+#turn on electrostatics
+pair_style lj/cut/coul/long 1.122462048 ${coul_cut}
+pair_coeff * * 1.0 1.0 1.122462048
+pair_modify	shift yes
+kspace_style pppm 1.0E-5
+dielectric ${epsilon}
+kspace_modify slab ${slab_factor} mismatch ${upper_delta} ${lower_delta} interface_height ${L} order_image_charge ${short_order} ${long_order} interface_charge ${upper_rho} ${lower_rho}
+neigh_modify delay 5 page 500000 one 5000 # defaults: page 100000 one 2000
+thermo_style custom step temp ke pe etotal ecoul elong evdwl ebond eangle
+thermo_modify flush yes
+fix lgv2 all langevin ${temperature} ${temperature} 1.0 8706
+timestep 0.01
+run 100000
+
+
+#production run
+reset_timestep 0
+dump 1 all custom 500 dump_salt.dat id type q x y z vx vy vz 
+dump_modify	1 sort id
+timestep 0.01
+run 1000000000 
+write_data salt.*.dat nocoeff

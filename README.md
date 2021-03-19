@@ -1,5 +1,4 @@
-# ICM-PPPM
-Description: 
+# Description: 
 
 The ICM-P3M is an efficient approach for simulating charged particle systems confined between two planar dielectric interfaces. 
 The system is 2D-periodic in X and Y dimensions where charged particles reside in middle region. 
